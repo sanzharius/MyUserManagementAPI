@@ -1,0 +1,43 @@
+version: '3.9'
+name: usermanager
+
+services:
+  usermanager:
+    container_name: usermanager_app
+    env_file: ./../configs/.env
+    tty: true
+    build:
+      context: ./../
+      dockerfile: ./build/package/Dockerfile
+    ports:
+      - ${PORT}:${PORT}
+    restart: on-failure
+    volumes:
+      - .:/usermanager
+    depends_on:
+      - mongodb
+    networks:
+      - usermanager_network
+
+  mongodb:
+    container_name: usermanager_db
+    image: 'mongo:latest'
+    ports:
+      - 27017:27017
+    volumes:
+      - database_mongodb:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+    networks:
+      - usermanager_network
+
+volumes:
+  usermanager:
+  database_mongodb:
+
+networks:
+  usermanager_network:
+    driver: bridge
