@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/caarlos0/env/v8"
 	"github.com/joho/godotenv"
 	"myAPIProject/internal/apperrors"
@@ -31,5 +32,15 @@ func NewConfig(path string) (*Config, error) {
 		return nil, apperrors.EnvConfigParseErr.AppendMessage(err)
 	}
 
+	MongoConfig := &Mongo{}
+	if err := env.Parse(MongoConfig); err != nil {
+		return nil, apperrors.EnvConfigParseErr.AppendMessage(err)
+	}
+
+	cfg.Mongo = MongoConfig
+
+	fmt.Printf("%+v\n", cfg)
+
 	return cfg, nil
+
 }

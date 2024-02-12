@@ -10,7 +10,7 @@ import (
 	"myAPIProject/internal/registry"
 )
 
-const Env = "./configs/.env"
+const Env = "C:\\Users\\sanzh\\go\\src\\myAPIProject\\configs\\.env"
 
 func main() {
 	log := logger.NewLogger()
