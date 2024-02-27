@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"myAPIProject/internal/domain/model"
 	"myAPIProject/internal/utils"
@@ -16,7 +15,7 @@ import (
 }*/
 
 type UserRepository interface {
-	Create(ctx context.Context, user *model.User) (primitive.ObjectID, error)
+	Create(ctx context.Context, user *model.User) (*uuid.UUID, error)
 	FindAll(ctx context.Context, paginationQuery *utils.PaginationQuery) ([]*model.User, error)
 	FindUserByNickname(ctx context.Context, nickname string) (*model.User, error)
 	FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error)

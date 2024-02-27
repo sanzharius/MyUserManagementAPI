@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,6 +14,7 @@ import (
 	"myAPIProject/internal/infrastructure/datastore"
 	"myAPIProject/internal/usecase/repository"
 	"myAPIProject/internal/utils"
+	"time"
 )
 
 type userRepository struct {
@@ -27,20 +29,37 @@ func NewUserRepository(collection *mongo.Collection, client *datastore.DB, logge
 		logger: logger}
 }
 
-func (db *userRepository) Create(ctx context.Context, user *model.User) (primitive.ObjectID, error) {
-	result, err := db.collection.InsertOne(ctx, user)
+func (db *userRepository) Create(ctx context.Context, user *model.User) (*uuid.UUID, error) {
+	currentTime := time.Now()
+	newUser := model.User{
+		ID:        user.ID,
+		Nickname:  user.Nickname,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Password:  user.Password,
+		Created: model.Created{
+			By: user.Created.By,
+			At: primitive.NewDateTimeFromTime(currentTime),
+		},
+		UpdatedAt: primitive.NewDateTimeFromTime(currentTime),
+		DeletedAt: primitive.NewDateTimeFromTime(time.Time{}),
+	}
+	result, err := db.collection.InsertOne(ctx, &newUser)
+	fmt.Printf("result = %s", result)
 	if err != nil {
 		db.logger.Error(err)
-		return primitive.NilObjectID, apperrors.MongoDBDataNotFoundErr.AppendMessage(err)
+		return nil, apperrors.MongoDBDataNotFoundErr.AppendMessage(err)
 	}
 
-	id, ok := result.InsertedID.(primitive.ObjectID)
-	if !ok {
+	id := result.InsertedID.(primitive.Binary).Data
+	insertedUUID, err := uuid.FromBytes(id)
+	if err != nil {
 		db.logger.Error(err)
-		return primitive.NilObjectID, apperrors.MongoDBDataNotFoundErr.AppendMessage(err)
+		return nil, apperrors.MongoDBDataNotFoundErr.AppendMessage(err)
 	}
 
-	return id, nil
+	return &insertedUUID, nil
 }
 
 func (db *userRepository) FindAll(ctx context.Context, paginationQuery *utils.PaginationQuery) ([]*model.User, error) {

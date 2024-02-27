@@ -1,13 +1,9 @@
 package repository
 
 import (
-	"context"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
-	"myAPIProject/internal/apperrors"
 	"myAPIProject/internal/infrastructure/datastore"
-	"myAPIProject/internal/usecase/repository"
-	"time"
 )
 
 type dbRepository struct {
@@ -16,7 +12,7 @@ type dbRepository struct {
 	logger     *logrus.Logger
 }
 
-func NewDBRepository(collection *mongo.Collection, db *datastore.DB, logger *logrus.Logger) repository.DBRepository {
+/*func NewDBRepository(collection *mongo.Collection, db *datastore.DB, logger *logrus.Logger) repository.DBRepository {
 	return &dbRepository{collection: collection,
 		db: db, logger: logger}
 }
@@ -35,4 +31,4 @@ func (dr *dbRepository) Transaction(sessionFunc func(interface{}) (interface{}, 
 
 	data, err := sessionFunc(session)
 	return data, nil
-}
+}*/

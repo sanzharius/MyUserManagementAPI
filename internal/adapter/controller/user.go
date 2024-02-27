@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -75,15 +76,16 @@ func (uc *userController) GetUser(ctx echo.Context) error {
 
 func (uc *userController) CreateUser(ctx echo.Context) error {
 	params := &model.User{}
-	mongoDBContext, cancel := context.WithTimeout(ctx.Request().Context(), time.Second*5)
-	defer cancel()
+	//mongoDBContext, cancel := context.WithTimeout(ctx.Request().Context(), time.Second*5)
+	//defer cancel()
 
 	if err := ctx.Bind(params); err != nil {
 		appError := apperrors.UserControllerCreateUserBind.AppendMessage(err)
 		return ctx.JSON(appError.HTTPCode, appError.Error())
 	}
 
-	createdUser, err := uc.userUseCase.Create(mongoDBContext, params)
+	createdUser, err := uc.userUseCase.Create(ctx.Request().Context(), params)
+	fmt.Printf("createdUser= %s", createdUser)
 	if err != nil {
 		appError := apperrors.UserControllerCreateUser.AppendMessage(err)
 		return ctx.JSON(appError.HTTPCode, appError.Error())

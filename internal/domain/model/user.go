@@ -22,13 +22,13 @@ type User struct {
 	LastName  string    `json:"last_name" bson:"last_name"`
 	Password  string    `json:"password" bson:"password"`
 	Created
-	UpdatedAt *primitive.DateTime `json:"updated_at" bson:"updated_at"`
-	DeletedAt *primitive.DateTime `json:"deleted_at" bson:"deleted_at"`
+	UpdatedAt primitive.DateTime `json:"updated_at" bson:"updated_at"`
+	DeletedAt primitive.DateTime `json:"deleted_at" bson:"deleted_at,omitempty"`
 }
 
 type Created struct {
-	By string              `json:"created_by" bson:"created_by,omitempty"`
-	At *primitive.DateTime `json:"created_at" bson:"created_at"`
+	By string             `json:"created_by" bson:"created_by,omitempty"`
+	At primitive.DateTime `json:"created_at" bson:"created_at"`
 }
 
 func (u *User) HashPassword() error {

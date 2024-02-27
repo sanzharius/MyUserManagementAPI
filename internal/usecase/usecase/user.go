@@ -12,12 +12,12 @@ import (
 
 type userUsecase struct {
 	userRepository repository.UserRepository
-	dbRepository   repository.DBRepository
+	/*dbRepository   repository.DBRepository*/
 }
 
 type User interface {
 	List(ctx context.Context, paginationQuery *utils.PaginationQuery) ([]*model.User, error)
-	Create(ctx context.Context, user *model.User) (*model.User, error)
+	Create(ctx context.Context, user *model.User) (*uuid.UUID, error)
 	GetUserByNickname(ctx context.Context, nickname string) (*model.User, error)
 	GetUser(ctx context.Context, userID uuid.UUID) (*model.User, error)
 	CheckUserByNickname(ctx context.Context, user *model.User) (bool, error)
@@ -25,10 +25,10 @@ type User interface {
 	DeleteUser(ctx context.Context, userID *uuid.UUID) error
 }
 
-func NewUserUsecase(userRepository repository.UserRepository, dbRepository repository.DBRepository) User {
+func NewUserUsecase(userRepository repository.UserRepository /*dbRepository repository.DBRepository*/) User {
 	return &userUsecase{
 		userRepository: userRepository,
-		dbRepository:   dbRepository,
+		/*dbRepository:   dbRepository,*/
 	}
 }
 
@@ -41,20 +41,9 @@ func (userUsecase *userUsecase) List(ctx context.Context, paginationQuery *utils
 	return user, nil
 }
 
-func (userUsecase *userUsecase) Create(ctx context.Context, user *model.User) (*model.User, error) {
-	data, err := userUsecase.dbRepository.Transaction(func(i interface{}) (interface{}, error) {
-		user, err := userUsecase.userRepository.Create(ctx, user)
-		if err != nil {
-			return nil, apperrors.MongoDBInsertErr.AppendMessage(err)
-		}
-
-		return user, err
-	})
-	userInst, ok := data.(*model.User)
-	if !ok {
-		return nil, apperrors.MongoDBCastErr.AppendMessage(err)
-	}
-
+func (userUsecase *userUsecase) Create(ctx context.Context, user *model.User) (*uuid.UUID, error) {
+	/*data, err := userUsecase.dbRepository.Transaction(func(i interface{}) (interface{}, error) {*/
+	userInst, err := userUsecase.userRepository.Create(ctx, user)
 	if err != nil {
 		return nil, apperrors.MongoDBInsertErr.AppendMessage(err)
 	}
